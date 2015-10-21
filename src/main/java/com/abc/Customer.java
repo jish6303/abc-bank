@@ -75,4 +75,12 @@ public class Customer {
     private String toDollars(double d){
         return String.format("$%,.2f", abs(d));
     }
+    
+    public void scheduleTransfer(Account from, Account to, double amount){
+    	from.send(to, amount);//Detail implementation is in Account.java
+    }
+    
+    public List<Account> getAccount(){
+    	return accounts;//For test purpose
+    }
 }
