@@ -45,35 +45,133 @@ public void withdraw(double amount) {
 }
 
     public double interestEarned() {
-        double amount = sumTransactions();
+    	//If interest is accrued daily, then we need to design a method to get every transaction,
+    	//for every period between two consecutive transactions, Δint = previous_balance * interval * days/365* interest rate;
         switch(accountType){
             case SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.001;
-                else
-                    return 1 + (amount-1000) * 0.002;
-//            case SUPER_SAVINGS:
-//                if (amount <= 4000)
-//                    return 20;
+                return calc_saving();
             case MAXI_SAVINGS:
-                long min = Long.MAX_VALUE;//min is used to track the min interval of last withdraw
-                Date today = new Date();
-                for(Transaction t : transactions){
-                	if(t.getAmount()<0){
-                		long interval = getDateDiff(t.getDate(), today, TimeUnit.DAYS);
-                		if(min < interval){
-                			min = interval;
-                		}
-                	}
-                }
-                if(min <= 10){
-                	return amount*0.001;
-                } else {
-                	return amount*0.05;
-                }
+                return calc_maxi_saving();
             default:
-                return amount * 0.001;
+                return calc_checking();
         }
+    }
+    
+    //This is used to calculate interest rate for checking
+    //Basic principle: find every transaction, calculate the intervals between two consecutive transaction,
+    //Δint = previous_balance * interval/365* annual_interest_rate;
+    //Accumulate interest
+    private double calc_checking(){
+    	double interest = 0.00;
+    	double balance = 0.00;
+    	Date prev = this.transactions.get(0).getDate();
+    	Date cur;
+    	long interval = 0;
+    	double accumulate = 0.00;
+    	for(int i = 0; i < transactions.size(); i++){
+    		Transaction t = this.transactions.get(i);
+    		if(i > 0){
+    			cur = t.getDate();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			accumulate = balance * interval * 0.001 / 365;
+    			interest += accumulate;
+    			prev = cur;
+    		}
+    		balance += t.getAmount(); //We need to process balance before moving towards next step.
+    		if(i == transactions.size() - 1){
+    			//If there is only one transaction or we've iterated through the final transaction
+    			//We need to calculate what interest of that balance, to today
+    			cur = new Date();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			accumulate = balance * interval * 0.001 / 365;
+    			interest += accumulate;
+    		}
+    	}
+    	return interest;
+    }
+    
+    //This is used to calculate interest rate for saving
+    //Basic principle: find every transaction, calculate the intervals between two consecutive transaction,
+    //Δint = previous_balance * interval/365* annual_interest_rate;
+    //Unlike checking, the annual interest rate of saving varies with balance;
+    private double calc_saving(){
+    	double annual_rate = 0.001;//
+    	double interest = 0.00;
+    	double balance = 0.00;
+    	Date prev = this.transactions.get(0).getDate();
+    	Date cur;
+    	long interval = 0;
+    	double accumulate = 0.00;
+    	for(int i = 0; i < transactions.size(); i++){
+    		Transaction t = this.transactions.get(i);
+    		if(i > 0){
+    			cur = t.getDate();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			if(balance < 1000){
+    				accumulate = balance * interval * annual_rate / 365;
+    			} else {
+    				accumulate = 1 + (balance - 1000) * interval * annual_rate * 2 / 365;
+    			}
+    			interest += accumulate;
+    			prev = cur;
+    		}
+    		balance += t.getAmount(); //We need to process balance before moving towards next step.
+    		if(i == transactions.size() - 1){
+    			//If there is only one transaction or we've iterated through the final transaction
+    			//We need to calculate what interest of that balance, to today
+    			cur = new Date();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			if(balance < 1000){
+    				accumulate = balance * interval * annual_rate / 365;
+    			} else {
+    				accumulate = 1 + (balance - 1000) * interval * annual_rate * 2 / 365;
+    			}
+    			interest += accumulate;
+    		}
+    	}
+    	return interest;
+    }
+    
+  //This is used to calculate interest rate for maxi-saving
+    //Basic principle: find every transaction, calculate the intervals between two consecutive transaction,
+    //Δint = previous_balance * interval/365* annual_interest_rate;
+    //Unlike checking and saving, the annual interest rate of maxi saving varies with condition whether there is withdrawal within 10days;
+    private double calc_maxi_saving(){
+    	double annual_rate = 0.05;//
+    	double interest = 0.00;
+    	double balance = 0.00;
+    	Date prev = this.transactions.get(0).getDate();
+    	Date cur;
+    	long interval = 0;
+    	double accumulate = 0.00;
+    	for(int i = 0; i < transactions.size(); i++){
+    		Transaction t = this.transactions.get(i);
+    		if(i > 0){
+    			cur = t.getDate();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			if(interval <= 10 && transactions.get(i - 1).getAmount()<0){//If previous is withdrawal and the interval is less than 10 days
+    				accumulate = balance * interval * 0.001 / 365;
+    			} else {
+    				accumulate = 1 + (balance - 1000) * interval * annual_rate / 365;
+    			}
+    			interest += accumulate;
+    			prev = cur;
+    		}
+    		balance += t.getAmount(); //We need to process balance before moving towards next step.
+    		if(i == transactions.size() - 1){
+    			//If there is only one transaction or we've iterated through the final transaction
+    			//We need to calculate what interest of that balance, to today
+    			cur = new Date();
+    			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
+    			if(interval <= 10 && transactions.get(i - 1).getAmount()<0){//If previous is withdrawal and the interval is less than 10 days
+    				accumulate = balance * interval * 0.001 / 365;
+    			} else {
+    				accumulate = 1 + (balance - 1000) * interval * annual_rate / 365;
+    			}
+    			interest += accumulate;
+    		}
+    	}
+    	return interest;
     }
 
     public double sumTransactions() {
