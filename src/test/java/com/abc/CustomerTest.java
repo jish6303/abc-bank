@@ -64,6 +64,10 @@ public class CustomerTest {
     	checking.deposit(1000);
     	checking.withdraw(100);
     	assertEquals(900.0, jiaju.getAccount().get(0).getBalance(), 1e-3);
+    	jiaju.scheduleTransfer(checking, saving, 100);
+    	assertEquals(800.0, jiaju.getAccount().get(0).getBalance(), 1e-3);
+    	assertEquals(100.0, jiaju.getAccount().get(1).getBalance(), 1e-3);
     }
+	
     
 }
