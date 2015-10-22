@@ -1,7 +1,9 @@
 package com.abc;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Account {
 
@@ -54,11 +56,21 @@ public void withdraw(double amount) {
 //                if (amount <= 4000)
 //                    return 20;
             case MAXI_SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.02;
-                if (amount <= 2000)
-                    return 20 + (amount-1000) * 0.05;
-                return 70 + (amount-2000) * 0.1;
+                long min = Long.MAX_VALUE;//min is used to track the min interval of last withdraw
+                Date today = new Date();
+                for(Transaction t : transactions){
+                	if(t.getAmount()<0){
+                		long interval = getDateDiff(t.getDate(), today, TimeUnit.DAYS);
+                		if(min < interval){
+                			min = interval;
+                		}
+                	}
+                }
+                if(min <= 10){
+                	return amount*0.001;
+                } else {
+                	return amount*0.1;
+                }
             default:
                 return amount * 0.001;
         }
@@ -107,6 +119,11 @@ public void withdraw(double amount) {
         	}
         }
     	
+    }
+    
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
 }

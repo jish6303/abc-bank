@@ -12,5 +12,14 @@ public class Transaction {
         this.amount = amount;
         this.transactionDate = DateProvider.getInstance().now();
     }
+    
+    //Added getAmount and getDate for each transaction, in order to adjust interest
+    public double getAmount(){
+    	return amount;
+    }
+    
+    public Date getDate(){
+    	return transactionDate;
+    }
 
 }
