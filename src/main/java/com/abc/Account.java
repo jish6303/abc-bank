@@ -69,7 +69,7 @@ public void withdraw(double amount) {
                 if(min <= 10){
                 	return amount*0.001;
                 } else {
-                	return amount*0.1;
+                	return amount*0.05;
                 }
             default:
                 return amount * 0.001;
