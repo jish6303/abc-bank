@@ -1,5 +1,8 @@
 package com.abc;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -20,6 +23,13 @@ public class Transaction {
     
     public Date getDate(){
     	return transactionDate;
+    }
+    
+    public void lastYear() throws ParseException{//For test use only. As interests are accrued by day, 
+    	//need to find out a way to change transaction date
+    	//Otherwise the interval will always be 0;
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	transactionDate= dateFormat.parse("2014-10-22");
     }
 
 }

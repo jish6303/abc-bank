@@ -150,9 +150,9 @@ public void withdraw(double amount) {
     			cur = t.getDate();
     			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
     			if(interval <= 10 && transactions.get(i - 1).getAmount()<0){//If previous is withdrawal and the interval is less than 10 days
-    				accumulate = balance * interval * 0.001 / 365;
+    				accumulate = balance * interval * 0.0001 / 365;
     			} else {
-    				accumulate = 1 + (balance - 1000) * interval * annual_rate / 365;
+    				accumulate = balance * interval * annual_rate / 365;
     			}
     			interest += accumulate;
     			prev = cur;
@@ -164,9 +164,9 @@ public void withdraw(double amount) {
     			cur = new Date();
     			interval = getDateDiff(prev, cur, TimeUnit.DAYS);
     			if(interval <= 10 && transactions.get(i).getAmount()<0){//If previous is withdrawal and the interval is less than 10 days
-    				accumulate = balance * interval * 0.001 / 365;
+    				accumulate = balance * interval * 0.0001 / 365;
     			} else {
-    				accumulate = 1 + (balance - 1000) * interval * annual_rate / 365;
+    				accumulate = balance * interval * annual_rate / 365;
     			}
     			interest += accumulate;
     		}

@@ -2,7 +2,6 @@ package com.abc;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
 public class CustomerTest {
@@ -54,4 +53,17 @@ public class CustomerTest {
         oscar.openAccount(new Account(Account.CHECKING));
         assertEquals(3, oscar.getNumberOfAccounts());
     }
+    
+	@Test
+	public void testTransfer(){
+    	Customer jiaju = new Customer("Jiaju");
+    	Account checking = new Account(Account.CHECKING);
+    	Account saving = new Account(Account.SAVINGS);
+    	jiaju.openAccount(checking);
+    	jiaju.openAccount(saving);
+    	checking.deposit(1000);
+    	checking.withdraw(100);
+    	assertEquals(900.0, jiaju.getAccount().get(0).getBalance(), 1e-3);
+    }
+    
 }
